@@ -1,0 +1,25 @@
+name: Generate
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 30 6 * * *
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.ACTION_TOKEN }}
+      - name: setup env
+        run: |
+          echo "ACTION_DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+      - name: Generate List
+        run: |
+          bash -x script/generate.sh
+      - name: Push to repository
+        id: list-push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update ${{ env.ACTION_DATE }}
